@@ -3,8 +3,8 @@ const { ok, fail } = require('../utils/response')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const UpdatesRepository = require('../repositories/updates.repository');
-//const http = require("http");
 const https = require('https')
+const config = require('../../config')
 
 class DataService {
   constructor (model, path) {
@@ -16,15 +16,14 @@ class DataService {
     return new Promise(
       (resolve, reject) => {
         const options = {
-          port: 443,
-          hostname: 'api.football-data.org',
-          path: '/v2/competitions',
+          port: config.api_port,
+          hostname: config.api_host,
+          path: '/'+(config.api_version)+'/'+(this.path),
           method: 'GET',
           headers: {
-            "X-Auth-Token": '3eec30c0ebb242a19c4e7543504823cc'
+            "X-Auth-Token": config.api_key
           }
         }
-
         const req = https.request(options, res => {
           let json = '';
 
@@ -39,38 +38,27 @@ class DataService {
             new UpdatesRepository().create({url: this.path})
             
             if (data.count == undefined) {
-              data[this.path] = [data]
+              data[this.getNamePath()] = [data]
             }
 
-            data[this.path].forEach(m => {
-              this.model.getModel().update({id: 11}, data.competitions[0], {upsert: true, setDefaultsOnInsert: true}, function(res){
-                console.log(res)
+            this.model.createOrUpdate(data[this.getNamePath()])
+              .then(res => {
+                resolve(data)
               })
-            })
 
-            /*const bulk = this.model.initializeUnorderedBulkOp({useLegacyOps: true});
-
-            bulk.find( { id: 1 } ).upsert().update(
-               {
-                 $set: data.competitions[0]
-               }
-            );
-            bulk.execute();*/
-            /*data.forEach(m => {
-              this.model.create(m)
-            })*/
-            resolve(data)
           });
         })
 
         req.on('error', error => {
-          console.error(error)
+          reject(error)
         })
 
         req.end()
         
     }).then(data => {
       return callback()
+    }).catch(error => {
+      return reject(error);
     });
   }
 
@@ -78,11 +66,10 @@ class DataService {
     return new UpdatesRepository()
       .wasUpdated(this.path)
       .then(res => {
-
         if (res > 0)
           return callback();
         
-        return this.callApi(callback)
+        return this.callApi(callback);
       })
       .then(ok(res))
       .catch(fail(res))
@@ -94,6 +81,23 @@ class DataService {
         return model
           .findAll()
       })
+  }
+
+  one (req, res, next) {
+    let model = this.model;
+    let id = this.getIdPath();
+    return this.getData(req, res, next, function(){
+        return model
+          .find(id)
+      })
+  }
+
+  getNamePath() {
+    return this.path.replace(/[0-9\/]+/gi, '');
+  }
+
+  getIdPath() {
+    return this.path.replace(/[a-z\/]+/gi, '');
   }
 
 }

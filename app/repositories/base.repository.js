@@ -15,13 +15,31 @@ class BaseRepository {
       .find({});
   }
 
+  find (id) {
+    const filter = {}
+    filter[this.key] = id
+
+    return this.model
+      .findOne(filter);
+  }
+
   create (data) {
     return this.model
       .create(data)
   }
 
-  getModel() {
-    return this.model;
+  createOrUpdate (objects) {
+    return this.model.bulkWrite(
+      objects.map((object) => 
+        ({
+          updateOne: {
+            filter: { 'id' : object.id },
+            update: { $set: object },
+            upsert: true
+          }
+        })
+      )
+    )
   }
 
 }
