@@ -2,23 +2,23 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 //create schema
-let Product = new Schema({
+let Competitions = new Schema({
+    id: {
+        type: Number, 
+        required: true
+    },
     name: {
     	type: String, 
     	required: true, 
     	max: 100
    	},
-    description: {
+    plan: {
     	type: String
     },
-    price: {
-    	type: Number, 
-    	required: true
-    },
 },{
-    collection: 'product'
+    collection: 'competitions'
 });
 
 
 // Export the model
-module.exports = mongoose.model('Product', Product);
+module.exports = mongoose.model('Competitions', Competitions);

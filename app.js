@@ -2,11 +2,13 @@ const express    = require('express');
 const cors       = require('cors');
 const bodyParser = require('body-parser');
 const mongoose   = require('mongoose');
-//const product    = require('./routes/product.route');
 const config     = require('./config');
 const app        = express();
 const http       = require('http').Server(app);
+
+//const product    = require('./routes/product.route');
 //const Product    = require('./models/product.model');
+
 
 
 mongoose.Promise = global.Promise;
@@ -19,7 +21,9 @@ mongoose.set('useFindAndModify', false);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+
 //app.use('/products', product);
+app.use('/competitions', require('./app/routes/competitions.route'));
 
 
 const port = config.port || 4000;
