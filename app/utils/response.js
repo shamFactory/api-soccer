@@ -1,9 +1,13 @@
 
-const ok = res => data => res.json({'error':false, 'records':data})
+const structure = (error, records) => { return {'error': error, 'records':records} }
 
-const fail = res => error => res.status(404).send({'error': true, 'records':error})
+const ok = res => data => res.json(structure(false, data))
+
+const fail = res => error => res.status(404).send(structure(true, error))
+
 
 module.exports = {
   ok,
-  fail
+  fail,
+  structure
 }

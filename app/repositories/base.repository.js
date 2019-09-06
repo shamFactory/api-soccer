@@ -12,7 +12,7 @@ class BaseRepository {
 
   findAll () {
     return this.model
-      .find({});
+      .find({}, '-_id -__v');
   }
 
   find (id) {
@@ -20,7 +20,7 @@ class BaseRepository {
     filter[this.key] = id
 
     return this.model
-      .findOne(filter);
+      .findOne(filter, '-_id -__v');
   }
 
   create (data) {

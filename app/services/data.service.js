@@ -37,13 +37,14 @@ class DataService {
             let data = JSON.parse(json);
             new UpdatesRepository().create({url: this.path})
             
-            if (data.count == undefined) {
+            if (!data.hasOwnProperty('count')) {
               data[this.getNamePath()] = [data]
             }
+            const dataApi = {...data}
 
             this.model.createOrUpdate(data[this.getNamePath()])
               .then(res => {
-                resolve(data)
+                resolve(dataApi)
               })
 
           });
@@ -56,9 +57,9 @@ class DataService {
         req.end()
         
     }).then(data => {
-      return callback()
+      return callback(data)
     }).catch(error => {
-      return reject(error);
+      throw error
     });
   }
 
