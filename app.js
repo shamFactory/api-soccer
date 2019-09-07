@@ -5,7 +5,7 @@ const mongoose   = require('mongoose');
 const config     = require('./config');
 const app        = express();
 const http       = require('http').Server(app);
-const { fail } = require('./app/utils/response')
+const { ok, fail } = require('./app/utils/response')
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DB, { useNewUrlParser: true }).then(

@@ -13,7 +13,10 @@ class TeamService extends DataService {
     let model = this.model;
     let id = this.getIdPath();
     return this.getData(req, res, next, function(data){
-       return new PlayersRepository().createOrUpdate(data['squad'])
+      if (data == undefined || data.length) 
+        return model.find(id)
+
+      return new PlayersRepository().createOrUpdate(data['squad'])
           .then(res => {
             return model.find(id)
           })        

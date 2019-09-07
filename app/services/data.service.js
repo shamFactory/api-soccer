@@ -78,7 +78,6 @@ class DataService {
 
         return ok(res)(resp)
       })
-      //.then(ok(res))
       .catch(fail(res))
   }
 
