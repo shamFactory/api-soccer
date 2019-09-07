@@ -72,7 +72,13 @@ class DataService {
         
         return this.callApi(callback);
       })
-      .then(ok(res))
+      .then((resp) => {
+        if(resp == null || resp.length == 0) 
+          return fail(res)('Data not found')
+
+        return ok(res)(resp)
+      })
+      //.then(ok(res))
       .catch(fail(res))
   }
 

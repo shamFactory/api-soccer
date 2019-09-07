@@ -5,7 +5,7 @@ const mongoose   = require('mongoose');
 const config     = require('./config');
 const app        = express();
 const http       = require('http').Server(app);
-const { structure } = require('./app/utils/response')
+const { fail } = require('./app/utils/response')
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DB, { useNewUrlParser: true }).then(
@@ -22,13 +22,16 @@ app.use('/competitions', require('./app/routes/competitions.route'));
 app.use('/team', require('./app/routes/team.route'));
 app.use('/players', require('./app/routes/players.route'));
 
-app.use(function(req, res, next) {
-  return res.status(404).send(structure(true, 'Route'+req.url+' Not found.'))
+app.use((req, res, next) => {
+	if (req.url == '/')
+		return ok(res)({})
+
+  return fail(res)("'Route '"+req.url+"' Not found.", 404)
 });
 
 // 500 - Any server error
-app.use(function(err, req, res, next) {
-  return res.status(500).send(structure(true, err))
+app.use((err, req, res, next) => {
+  return fail(res)(err, 500)
 });
 
 const port = config.port || 4000;

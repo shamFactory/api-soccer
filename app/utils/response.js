@@ -3,7 +3,7 @@ const structure = (error, records) => { return {'error': error, 'records':record
 
 const ok = res => data => res.json(structure(false, data))
 
-const fail = res => error => res.status(404).send(structure(true, error))
+const fail = res => (error, status) => res.status(status == null ? 404 : status ).send(structure(true, error))
 
 
 module.exports = {
